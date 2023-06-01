@@ -8,7 +8,8 @@ public class Userfile
     Print user = new Print();
     int flightIndex = 0 ;
 
-    public void userMenus( int return_mod, RandomAccessFile userFile , RandomAccessFile flightFile , RandomAccessFile ticketFile) throws IOException, InterruptedException {
+    public void userMenus( int return_mod, RandomAccessFile userFile , RandomAccessFile flightFile , RandomAccessFile ticketFile) throws IOException, InterruptedException
+    {
 
         int input_user = cin.nextInt() ;
         switch (input_user)
