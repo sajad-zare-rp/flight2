@@ -62,7 +62,7 @@ public class Print {
 
     }
 
-    public void adminMenu(RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) {
+    public void adminMenu( int return_mod ,RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException {
 
         System.out.println("Enter your number");
         System.out.println("1-Add Flight");
@@ -71,7 +71,7 @@ public class Print {
         System.out.println("4-Flight schedules Flight");
         System.out.println("0-Sign out Flight");
 
-        admin.adminMenus();
+        admin.adminMenus( return_mod , userFile ,  flightFile,  ticketFile);
 
     }
 
@@ -243,7 +243,7 @@ public class Print {
             cin.next();
             Admin admin1 = new Admin();
             if (return_mod == 1) {
-                adminMenu(userFile, flightFile, ticketFile);
+                adminMenu(  return_mod ,userFile, flightFile, ticketFile);
             } else {
                 userMenu(userFile, flightFile, ticketFile);
             }

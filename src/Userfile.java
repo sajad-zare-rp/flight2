@@ -141,60 +141,6 @@ public class Userfile
 
     public void booked_ticket()
     {
-        System.out.println("Enter Your ticketId");
-        String tempId ;
-        int input = cin.nextInt();
-        int tempF = 0 ;
-        System.out.print("\n\t\t\t\t\t\t\t\t\t\033[90m      << Flights List >>\033[97m\n");
-
-        System.out.println("\033[35m");
-        System.out.print("\t\t\t\t\t");
-        System.out.print("+---------------------------------------------------------------------------------------------+");
-        System.out.print("\n\t\t\t\t\t");
-        System.out.printf("| %-1s| %-1s| %-1s| %-1s| %-1s| %-1s| %-1s|", "\033[33m  Flight ID  \033[35m", "\033[33m   Origins   \033[35m", "\033[33m  Destention  \033[35m", "\033[33m    Data    \033[35m", "\033[33m   Time   \033[35m", "\033[33m   Price   \033[35m", "\033[33m Seats \033[35m");
-        System.out.println();
-        for (int i = 0; i <bookedTicket.length ; i++) {
-            if ( bookedTicket[i] != null && bookedTicket[i].getTicketId() == input )
-            {
-
-                tempId = bookedTicket[i].getFlightId();
-                for (int j = 0; j <Print.flightObjects.length ; j++)
-                {
-
-                    if ( Print.flightObjects[j].getFlightId() != null && Print.flightObjects[j].getFlightId().equals(tempId) )
-                    {
-                        tempF = j ;
-                    }
-
-                }
-                System.out.print("\033[35m\t\t\t\t\t");
-                System.out.print("+---------------------------------------------------------------------------------------------+");
-                try {
-                    Thread.sleep(80);
-                } catch (InterruptedException e) {
-                }
-
-
-
-                System.out.print("\n\t\t\t\t\t");
-                System.out.printf("|\033[97m    %-10s\033[35m|\033[97m    %-10s\033[35m|\033[97m    %-11s\033[35m|\033[97m %-12s\033[35m|\033[97m  %-9s\033[35m|\033[97m  %-10s\033[35m|\033[97m  %-4s\033[35m  ", Print.flightObjects[tempF].getFlightId(), Print.flightObjects[tempF].getFlightOrigin(), Print.flightObjects[tempF].getFlightDestination(), Print.flightObjects[tempF].getFlightDate(), Print.flightObjects[tempF].getFlightTime(),Print.flightObjects[tempF].getFlightPrice(), Print.flightObjects[tempF].getFlightSeat());
-                System.out.println("|");
-                try {
-                    Thread.sleep(80);
-                } catch (InterruptedException e) {
-                }
-                Print.user_menu();
-            }
-
-
-            if (  bookedTicket[i] != null && bookedTicket[i].getTicketId() != input  )
-            {
-
-                System.out.println("TicketId not Exist ");
-                Print.user_menu();
-
-            }
-        }
 
     }
     public void charge(RandomAccessFile userFile ,  RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException
