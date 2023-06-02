@@ -4,14 +4,14 @@ import java.util.Scanner;
 
 public class Print {
     Scanner cin = new Scanner(System.in);
-    Userfile start = new Userfile();
     Admin admin = new Admin();
-    String username;
-    String password;
+
+
     String str;
-    int loginIndex = 0;
+   static int  loginIndex ;
     int startPoint;
-    int flag = 0;
+    int flag ;
+    int userIndex = 0 ;
     final int FIXSTRING = 40;
     final int USERLENGHT = 84;
     final int FLIGHTLENGHT = 208;
@@ -23,29 +23,34 @@ public class Print {
     static public long ticketCounter = 0;
 
 
-    public void userMenu(RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) {
-
+    public void userMenu(String username,String password,int return_mod,RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException {
+        Userfile user = new Userfile();
         System.out.println("Enter your number");
         System.out.println("1-change password");
-        System.out.println("2-booking ticket");
-        System.out.println("3-booked ticket");
-        System.out.println("4-cancel ticket");
-        System.out.println("5-charge valet");
-        System.out.println("6-sign out");
+        System.out.println("2-search flight");
+        System.out.println("3-booking ticket");
+        System.out.println("4-booked ticket");
+        System.out.println("5-cancel ticket");
+        System.out.println("6-charge valet");
+        System.out.println("0-sign out");
 
+        user.userMenus( username , password, return_mod,  userFile ,  flightFile , ticketFile);
 
     }
 
-    public void firstMenu() throws IOException {
+    public void firstMenu(String username , String password ,int return_mod) throws IOException, InterruptedException
+    {
 
         RandomAccessFile userFile = new RandomAccessFile("UserFile.saj", "rw");
         RandomAccessFile flightFile = new RandomAccessFile("FlightFile.saj", "rw");
         RandomAccessFile ticketFile = new RandomAccessFile("TicketFile.saj", "rw");
 
 
+
         userCounter = userFile.length() / USERLENGHT;
         flightCounter = flightFile.length() / FLIGHTLENGHT;
         ticketCounter = ticketFile.length() / TICKETLENGHT;
+        defaultFlight(flightFile);
 
 
         System.out.println("Enter Your number");
@@ -54,15 +59,15 @@ public class Print {
         int input = cin.nextInt();
         switch (input) {
             case 1:
-                signUp(userFile);
+                signUp(return_mod , userFile);
             case 2:
-                signIn(userFile, flightFile, ticketFile);
+                signIn(username , password ,return_mod , userFile, flightFile, ticketFile);
         }
 
 
     }
 
-    public void adminMenu( int return_mod ,RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException {
+    public void adminMenu( String username,String password,int return_mod ,RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException {
 
         System.out.println("Enter your number");
         System.out.println("1-Add Flight");
@@ -71,54 +76,74 @@ public class Print {
         System.out.println("4-Flight schedules Flight");
         System.out.println("0-Sign out Flight");
 
-        admin.adminMenus( return_mod , userFile ,  flightFile,  ticketFile);
+        admin.adminMenus( username,password,return_mod , userFile ,  flightFile,  ticketFile);
 
     }
 
-    public void signUp(RandomAccessFile userFile) throws IOException {
+    public void signUp( int return_mod ,RandomAccessFile userFile) throws IOException, InterruptedException {
 
         System.out.println("Enter your username and password :");
         System.out.println("username :");
         System.out.println("password :");
-        username = cin.next();
-
-
-        password = cin.next();
-
-        if (checkUser(username, userFile) == -1) {
-            writeString(startPoint, username, userFile);
-            firstMenu();
-        } else {
-            System.out.println("username is exist ");
-            signUp(userFile);
+        String username = cin.next();
+       String password = cin.next();
+        if ( username.equals("admin") )
+        {
+            System.out.println("username is not correct");
+            signUp(return_mod , userFile);
         }
+        for (int i = 0; i < userCounter; i++)
+        {
+            if (readString(i*USERLENGHT,userFile).equals(username)) {
+                {
+                    System.out.println("username is exist ");
+                    signUp(return_mod ,userFile);
+
+
+                }
+
+
+            }
+        }
+
+        writeString(userCounter * USERLENGHT, username, userFile);
+        writeString(userCounter * USERLENGHT + FIXSTRING, password , userFile);
+        userFile.writeInt(0);
+        firstMenu(username,password,return_mod);
+
+
 
 
     }
 
-    public void signIn(RandomAccessFile userFile, RandomAccessFile flightFile , RandomAccessFile ticketFile) throws IOException {
+    public void signIn ( String username, String password ,int return_mod , RandomAccessFile userFile, RandomAccessFile flightFile , RandomAccessFile ticketFile) throws IOException, InterruptedException {
         System.out.println("Enter username and password");
         System.out.println("username :");
         System.out.println("password :");
         username = cin.next();
         password = cin.next();
+        if (username.equals("admin") && password.equals("admin"))
+        {
+            adminMenu( username,password,return_mod , userFile, flightFile,  ticketFile);
+        }
         if (checkUser(username, userFile, password) == true)
-            userMenu(userFile, flightFile, ticketFile);
+            userMenu(username,password,return_mod,userFile, flightFile, ticketFile);
         else {
             System.out.println("username or password is not correct");
-            firstMenu();
+            firstMenu(username,password,return_mod);
         }
 
 
     }
 
-    public String readString(int startPoint, RandomAccessFile userFile) throws IOException {
+    public String readString(int startPoint, RandomAccessFile rFile) throws IOException {
 
         String str = "";
         rFile.seek(startPoint);
 
-        for (int i = 0; i < userCounter; i++) {
-            str += userFile.readChar();
+        for (int i = 0; i < 20; i++)
+        {
+            str += rFile.readChar();
 
         }
 
@@ -126,22 +151,16 @@ public class Print {
 
     }
 
-    public int checkUser(String username, RandomAccessFile userFile) throws IOException {
-        for (int i = 0; i < userCounter; i++) {
-            if (readString(i * 84, userFile).equals(username))
-                return i;
-        }
 
-        return -1;
-
-    }
 
     public boolean checkUser(String username, RandomAccessFile userFile, String password) throws IOException {
         for (int i = 0; i < userCounter; i++) {
-            if (readString(i * USERLENGHT, userFile).equals(username)) {
+            if (readString(i * USERLENGHT, userFile).equals(username))
+            {
 
                 if (readString((i * USERLENGHT) + FIXSTRING, userFile).equals(password))
                     loginIndex = i;
+                System.out.println(loginIndex);
                 return true;
 
             }
@@ -193,7 +212,7 @@ public class Print {
         writeString(2 * FIXSTRING, ("TEHRAN"), flightFile);
         writeString(3 * FIXSTRING, ("1402-11-18"), flightFile);
         writeString(4 * FIXSTRING, ("9:45"), flightFile);
-        flightFile.writeLong(700000);
+        flightFile.writeInt(700000);
         flightFile.writeInt(8);
 
 
@@ -202,16 +221,16 @@ public class Print {
         writeString(FLIGHTLENGHT + 2 * FIXSTRING, fixString("GHOM"), flightFile);
         writeString(FLIGHTLENGHT + 3 * FIXSTRING, fixString("1401-11-13"), flightFile);
         writeString(FLIGHTLENGHT + 4 * FIXSTRING, fixString("7:30"), flightFile);
-        flightFile.writeLong(400000);
+        flightFile.writeInt(400000);
         flightFile.writeInt(32);
 
 
-        writeString(2 * FLIGHTLENGHT + FIXSTRING, fixString("WX-12"), flightFile);
-        writeString(2 * FLIGHTLENGHT + 1 * FIXSTRING, fixString("YAZD"), flightFile);
-        writeString(2 * FLIGHTLENGHT + 2 * FIXSTRING, fixString("MASHHAD"), flightFile);
+        writeString(2 * FLIGHTLENGHT , fixString("WX-12"), flightFile);
+        writeString(2 * FLIGHTLENGHT +  FIXSTRING, fixString("YAZD"), flightFile);
+        writeString(2 * FLIGHTLENGHT + 2* FIXSTRING, fixString("MASHHAD"), flightFile);
         writeString(2 * FLIGHTLENGHT + 3 * FIXSTRING, fixString("1401-12-20"), flightFile);
         writeString(2 * FLIGHTLENGHT + 4 * FIXSTRING, fixString("17:45"), flightFile);
-        flightFile.writeLong(800000);
+        flightFile.writeInt(800000);
         flightFile.writeInt(75);
     }
     public static void tableHeadPrinter() throws IOException, InterruptedException {
@@ -222,7 +241,7 @@ public class Print {
         System.out.print("+---------------------------------------------------------------------------------------------+");
     }
 
-    public void flightTable(int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException {
+    public void flightTable(String username,String password,int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException {
         try {
             Userfile user_ins = new Userfile();
 
@@ -243,40 +262,20 @@ public class Print {
             cin.next();
             Admin admin1 = new Admin();
             if (return_mod == 1) {
-                adminMenu(  return_mod ,userFile, flightFile, ticketFile);
+                adminMenu( username,password ,return_mod ,userFile, flightFile, ticketFile);
             } else {
-                userMenu(userFile, flightFile, ticketFile);
+                userMenu(username,password,return_mod,userFile, flightFile, ticketFile);
             }
         } catch (Exception var7) {
 
             cin.next();
 
-            flightTable(return_mod, userFile, flightFile, ticketFile);
+            flightTable(username,password,return_mod, userFile, flightFile, ticketFile);
         }
 
 
     }
 
-    public String readStringFlight(int startPoint, RandomAccessFile flightFile) throws IOException {
 
-        String str = "";
-        rFile.seek(startPoint);
 
-        for (int i = 0; i < flightCounter; i++) {
-            str += flightFile.readChar();
-
-        }
-
-        return str.trim();
-
-    }
-    public int checkFlight(String flightIn, RandomAccessFile flightFile) throws IOException {
-        for (int i = 0; i < userCounter; i++) {
-            if (readString(i * 208 + 200 , flightFile).equals(username))
-                return i;
-        }
-
-        return -1;
-
-    }
 }

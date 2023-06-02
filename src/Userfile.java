@@ -8,7 +8,7 @@ public class Userfile
     Print user = new Print();
     int flightIndex = 0 ;
 
-    public void userMenus( int return_mod, RandomAccessFile userFile , RandomAccessFile flightFile , RandomAccessFile ticketFile) throws IOException, InterruptedException
+    public void userMenus(String username ,String password, int return_mod, RandomAccessFile userFile , RandomAccessFile flightFile , RandomAccessFile ticketFile) throws IOException, InterruptedException
     {
 
         int input_user = cin.nextInt() ;
@@ -16,10 +16,10 @@ public class Userfile
         {
 
             case 1 :
-                change_pass(userFile);
+                change_pass(username,password,return_mod,userFile,flightFile,ticketFile);
                 break;
             case 2 :
-                searching(return_mod,userFile, flightFile, ticketFile);
+                searching(username,password,return_mod,userFile, flightFile, ticketFile);
                 break;
             case  3 :
                 booking_ticket(return_mod, userFile, flightFile, ticketFile);
@@ -31,10 +31,10 @@ public class Userfile
                 booked_ticket();
                 break;
             case 6 :
-                charge(userFile ,flightFile , ticketFile );
+                charge(username,password,return_mod,userFile ,flightFile , ticketFile );
                 break;
             case 0 :
-                sign_out();
+                sign_out(username , password,return_mod);
                 break;
 
         }
@@ -43,8 +43,7 @@ public class Userfile
 
 
 
-    public void change_pass(RandomAccessFile userFile ) throws IOException
-    {
+    public void change_pass(String username,String password,int return_mod,RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException {
         System.out.println("Enter last password");
         String lastPass = cin.next();
 
@@ -53,9 +52,9 @@ public class Userfile
         {
             System.out.println("Enter a new password");
             String newPass = cin.next();
-            user.writeString(user.loginIndex, newPass , userFile);
-            System.out.println("password change");
-            user.firstMenu();
+            user.writeString(user.loginIndex*user.USERLENGHT +40, newPass , userFile);
+            System.out.println("password changed");
+            user.userMenu(username,password,return_mod,userFile,flightFile,ticketFile);
 
 
 
@@ -65,36 +64,36 @@ public class Userfile
         {
 
             System.out.println("last password not correct ");
-            change_pass(userFile);
+            change_pass( username,password,return_mod,userFile,flightFile,ticketFile);
 
         }
 
 
     }
 
-    public void searching(int return_mod,RandomAccessFile userFile, RandomAccessFile flightFile,RandomAccessFile ticketFile) throws IOException, InterruptedException {
+    public void searching(String username,String password,int return_mod,RandomAccessFile userFile, RandomAccessFile flightFile,RandomAccessFile ticketFile) throws IOException, InterruptedException {
 
         user.searchMenu();
         int inputSearch = cin.nextInt();
         switch (inputSearch)
         {
             case 1 :
-                searchOrigin(return_mod, userFile, flightFile,  ticketFile);
+                searchOrigin(username,password,return_mod, userFile, flightFile,  ticketFile);
                 break;
             case 2 :
-                searchDestination(return_mod, userFile, flightFile,  ticketFile);
+                searchDestination(username,password,return_mod, userFile, flightFile,  ticketFile);
                 break;
             case 3 :
-                searchDate(return_mod, userFile, flightFile,  ticketFile);
+                searchDate(username,password,return_mod, userFile, flightFile,  ticketFile);
                 break;
             case 4 :
-                searchTime(return_mod, userFile, flightFile,  ticketFile);
+                searchTime(username,password,return_mod, userFile, flightFile,  ticketFile);
                 break;
             case  5 :
                 searchPrice();
                 break;
             case  6 :
-                searchId(return_mod,userFile, flightFile, ticketFile);
+                searchId(username,password,return_mod,userFile,flightFile, ticketFile);
                 break;
             default:
                 user.searchMenu();
@@ -104,7 +103,7 @@ public class Userfile
 
 
         }
-        user.userMenu(userFile , flightFile , ticketFile);
+        user.userMenu(username,password,return_mod,userFile , flightFile , ticketFile);
 
 
     }
@@ -144,22 +143,22 @@ public class Userfile
     {
 
     }
-    public void charge(RandomAccessFile userFile ,  RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException
-    {
+    public void charge(String username,String password,int return_mod ,RandomAccessFile userFile ,  RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException {
 
         System.out.println("Enter How much do you want to charge");
-        String inputValet = cin.next();
-        user.writeString(user.loginIndex * user.USERLENGHT + 80 , inputValet , userFile );
+        int inputValet = cin.nextInt();
+        userFile.seek(Print.loginIndex *user.USERLENGHT+ 80);
+        userFile.writeInt(inputValet);
         System.out.println("charging don ");
-        user.userMenu(userFile , flightFile , ticketFile );
+        user.userMenu(username,password,return_mod,userFile , flightFile , ticketFile );
 
     }
-    public void sign_out() throws IOException {
-        user.firstMenu();
+    public void sign_out(String username ,String password ,int return_mod) throws IOException, InterruptedException {
+        user.firstMenu(username ,password ,return_mod);
 
     }
 
-    public void searchId(int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException
+    public void searchId(String username,String password,int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException
     {
 
         System.out.println("Enter flight id");
@@ -168,13 +167,13 @@ public class Userfile
 
         if ( checkFlightId(inputId  , flightFile) == 1 )
         {
-            user.flightTable( return_mod, userFile, flightFile, ticketFile);
+            user.flightTable( username,password,return_mod, userFile, flightFile, ticketFile);
         }
 
 
     }
 
-    public void searchOrigin (int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException
+    public void searchOrigin (String username,String password,int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException
     {
         System.out.println("Enter origin");
         String inputOrigin = cin.next();
@@ -182,12 +181,12 @@ public class Userfile
 
         if ( checkFlightOrigin(inputOrigin , flightFile) == 1 )
         {
-            user.flightTable(return_mod, userFile, flightFile, ticketFile);
+            user.flightTable(username,password,return_mod, userFile, flightFile, ticketFile);
         }
 
 
     }
-    public void searchDestination(int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException
+    public void searchDestination(String username,String password,int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException
     {
         System.out.println("Enter destination");
         String inputDestination = cin.next();
@@ -195,11 +194,11 @@ public class Userfile
 
         if ( checkFlightOrigin(inputDestination, flightFile) == 1 )
         {
-            user.flightTable(return_mod, userFile, flightFile, ticketFile);
+            user.flightTable(username ,password,return_mod, userFile, flightFile, ticketFile);
         }
 
     }
-    public void searchDate(int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException
+    public void searchDate(String username,String password,int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException
     {
         System.out.println("Enter date");
         String inputDate = cin.next();
@@ -207,11 +206,11 @@ public class Userfile
 
         if ( checkFlightOrigin(inputDate , flightFile) == 1 )
         {
-            user.flightTable(return_mod, userFile, flightFile, ticketFile);
+            user.flightTable(username ,password,return_mod, userFile, flightFile, ticketFile);
         }
 
     }
-    public void searchTime (int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException
+    public void searchTime (String username,String password,int return_mod, RandomAccessFile userFile, RandomAccessFile flightFile, RandomAccessFile ticketFile) throws IOException, InterruptedException
     {
         System.out.println("Enter time");
         String inputTime = cin.next();
@@ -219,7 +218,7 @@ public class Userfile
 
         if ( checkFlightOrigin(inputTime , flightFile) == 1 )
         {
-            user.flightTable(return_mod, userFile, flightFile, ticketFile);
+            user.flightTable(username ,password,return_mod, userFile, flightFile, ticketFile);
         }
     }
     public void searchPrice ()
@@ -232,6 +231,9 @@ public class Userfile
 
     public int checkPassword(String lastPass , RandomAccessFile userFile ) throws IOException
     {
+        System.out.println("password:");
+        System.out.println( user. readString(user.loginIndex * user.USERLENGHT + 40 , userFile ));
+        System.out.println(user.loginIndex);
        if( user. readString(user.loginIndex * user.USERLENGHT + 40 , userFile ).equals(lastPass))
            return 1 ;
        else
@@ -255,7 +257,8 @@ public class Userfile
     {
         for (int i = 0; i < Print.flightCounter ; i++)
         {
-            if (user.readStringFlight(i * user.FLIGHTLENGHT, flightFile).equals(inputId)) {
+
+            if (user.readString(i * user.FLIGHTLENGHT, flightFile).equals(inputId)) {
                 flightIndex = i;
                 return 1;
             }
@@ -270,7 +273,7 @@ public class Userfile
     {
         for (int i = 0; i < Print.flightCounter ; i++)
         {
-            if ( user.readStringFlight(i*user.FLIGHTLENGHT +40 , flightFile ).equals(inputId) ) {
+            if ( user.readString(i*user.FLIGHTLENGHT +40 , flightFile ).equals(inputId) ) {
                 flightIndex = i ;
                 return 1;
             }
@@ -283,7 +286,7 @@ public class Userfile
     {
         for (int i = 0; i < Print.flightCounter ; i++)
         {
-            if ( user.readStringFlight(i*user.FLIGHTLENGHT +80 , flightFile ).equals(inputId) ) {
+            if ( user.readString(i*user.FLIGHTLENGHT +80 , flightFile ).equals(inputId) ) {
                 flightIndex = i ;
                 return 1;
             }
@@ -296,7 +299,7 @@ public class Userfile
     {
         for (int i = 0; i < Print.flightCounter ; i++)
         {
-            if ( user.readStringFlight(i*user.FLIGHTLENGHT+120 , flightFile ).equals(inputId) ) {
+            if ( user.readString(i*user.FLIGHTLENGHT+120 , flightFile ).equals(inputId) ) {
                 flightIndex = i ;
                 return 1;
             }
@@ -309,7 +312,7 @@ public class Userfile
     {
         for (int i = 0; i < Print.flightCounter ; i++)
         {
-            if ( user.readStringFlight(i*user.FLIGHTLENGHT + 160 , flightFile ).equals(inputId) ) {
+            if ( user.readString(i*user.FLIGHTLENGHT + 160 , flightFile ).equals(inputId) ) {
                 flightIndex = i ;
                 return 1;
             }
