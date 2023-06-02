@@ -224,7 +224,7 @@ public class Print {
         flightFile.writeInt(400000);
         flightFile.writeInt(32);
 
-
+//*****************************************************************************************
         writeString(2 * FLIGHTLENGHT , fixString("WX-12"), flightFile);
         writeString(2 * FLIGHTLENGHT +  FIXSTRING, fixString("YAZD"), flightFile);
         writeString(2 * FLIGHTLENGHT + 2* FIXSTRING, fixString("MASHHAD"), flightFile);
